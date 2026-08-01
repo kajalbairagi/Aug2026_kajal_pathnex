@@ -1,0 +1,12 @@
+# Docker File 
+FROM ubuntu:20.04
+CMD ["echo", "Hello Pathnex"]
+
+
+- name: Install Nginx on pathenex server
+ hosts: all
+ become: yes
+ tasks:
+  -name: Install nginx
+   yum: 
+    name:nginx
