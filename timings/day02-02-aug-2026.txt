@@ -1,0 +1,22 @@
+# What I did today
+# I have learnt Linux command from todays class like
+# pWD - present working directory
+# cd - change directory
+# mkdir - make directory
+# ls - list
+# ls -la  for all the files including hidden 
+# ls -lah for human readable storage
+# ls -lahr for reverse
+# chmod - change mode
+# chmod 777   - means read -4, write - 2, execute- 1 = all togater 7 
+# mv - for move and rename 
+# rm - for delete the file and rm -r - for recursively deletin# g directory
+# touch - for creating file
+# cat for view file content 
+# vim - also for creating file
+# drwxrwxrwx d- directory, rwx- owner, rwx-group, rwx- other
+# For execute the file ./filename
+# ln kajal\~ ../newfile -- hard link , it contains memory and if we delete hard link original file then also other files works and if we change one file it reflect to others too.
+
+# ln -s kajal new1  - this is soft link , if we delete original file then other soft links no longer in use , it won't take memory . it show l when softlink created like lrwxrwxrwx
+
