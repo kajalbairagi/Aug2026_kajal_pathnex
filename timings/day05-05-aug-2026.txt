@@ -1,0 +1,6 @@
+## Day 5 
+# I have attended morning class which and rewatch it for much clear understanding , I learned commands such as ps , kill, pkill, grep, egrep, egrep -v, inconfig , ping, telnet, netcat, curl, cronjob.
+
+# I did practice for 2 hours on CLI 
+# I have attended evening class for 30 mins and explained topic for 2 mins
+
