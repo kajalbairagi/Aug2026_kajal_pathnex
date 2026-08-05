@@ -8,7 +8,7 @@
   become: yes
 
  tasks:
-  - name: update config file 
+  - name: update config file
     copy:
      src: index.html
      dest: /usr/share/nginx/html/index.html
@@ -26,7 +26,6 @@ handlers:
 resouce "aws_instance" "pathnexEC2"{
   ami = "ami-0abcd1234abcd1234"
   instance_type = "c6a.12xlarge"
- 
 
 
   user_data = <<EOF
@@ -61,6 +60,8 @@ spec:
 
 
 
+
+
 ## Day 05 - Environment Variables
 # You will learn how to use environment variables in Jenkins pipelines
 
@@ -77,12 +78,14 @@ stages{
     }
     stage{
       steps{
-        sh 'mvn clean package -Dinstitute.name=$INSTITUTE_NAME' 
+        sh 'mvn clean package -Dinstitute.name=$INSTITUTE_NAME'
 
         }
       }
   }
 }
+
+
 
 
 ## GitLab CI -Use Environment Variables
@@ -103,35 +106,5 @@ build:
      - cd aug2026_kajal_pathnex
      - echo "Welcome to $ INSTITUTE_NAME Devops Training"
      - mvn clean package - Dinstitute.name=$INSTITUTE_NAME
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
