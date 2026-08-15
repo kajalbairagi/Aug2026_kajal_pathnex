@@ -1,0 +1,6 @@
+## Day 15
+
+# I attended 4 hours class in the morning 
+# I will attent evening class for 30 min and other terraform inigrated class for one hour
+# I did daily tasks for 1 hour
+# I will prepare introduction video today.
