@@ -1,0 +1,6 @@
+# Day 17
+
+#I have created eks cluster and troubleshooting the issues
+# I prepared the topic which I explained in evening class
+# I completed daily git tasks
+# I created introduction video
