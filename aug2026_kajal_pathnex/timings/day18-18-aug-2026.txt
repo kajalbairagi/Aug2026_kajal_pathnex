@@ -1,0 +1,9 @@
+#Day 18 
+
+#I have attended 3 hours class where I learnt about helm which is a package control for kubernetes.
+
+# I practices creating cluster and implementation for 2 hours
+
+# I completed daily tasks git push 
+
+# created introduction video   
