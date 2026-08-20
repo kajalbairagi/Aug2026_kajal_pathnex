@@ -1,0 +1,118 @@
+# Day 20 Debug Day
+
+Fixing broken files:
+
+## Ansible Install stuff
+
+- name: Install httpd
+  hosts: all
+  become: yes
+  
+  tasks:
+    - name: Install
+      yum:
+       name: httpd
+       state: present
+
+## Terraform 
+
+resource "aws_instance" "Bad"{
+  ami = "ami-o1234abcd1234abcd"
+  instance_type = "c6i-8xlarge"
+  
+  tags = {
+    Name = "Pathnex"
+  }
+}
+
+## Kubernetes 
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-app
+
+spec:
+  replicas: 3
+
+  selector:
+    matchLabels:
+       app: broken
+    template:
+       metadata:
+         labels:
+          app: broken 
+
+    spec:
+      containers:
+        - name: app
+         image: nginx
+
+
+## Secrets and credentials
+
+# jenkins Pipeline - using Credentials
+
+pipeline{
+ agent any
+  environment{
+    INSTITUTE_NAME = "Pathnex"
+}
+  stages{
+     stage('Checkout'){
+       steps{
+          git url: 'git@github.com:kajalbairagi/Aug2026_kajal_pathnex.git'
+
+}
+}
+    stage('Use secret'){
+       withCredentials([string(credentialsId: 'PATHNEX_API_KEY', variable: 'API_KEY')]){
+        sh 'echo "Using secret $API_KEY for $INSTITUTE_NAME"'
+}
+ }
+}
+
+}
+
+
+## Gitlab CI - Using CI/CD Variables
+
+stages:
+  - build
+
+variables:
+   INSTITUTE_NAME: "Pathnex"
+   API_KEY: "PLACEHOLDER_SECRET"
+
+build:
+  stage: build
+  image: alpine:latest
+
+  script:
+    - echo "Using secret $API_KEY for $INSTITUTE_NAME"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
