@@ -1,0 +1,7 @@
+#Day 23
+
+#Today i attended morning class and learnt about jenkins pipeline .
+#I'm doing coding practice
+#I'll make a intorduction video
+#I will prepare the content for evening class presentation.
+# I'll do the hands-on today 
