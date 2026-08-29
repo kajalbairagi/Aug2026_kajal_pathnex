@@ -1,0 +1,6 @@
+ Day 22
+# I ahve attended morning class and rewateched again for clear understanding.
+# I did practice of today's topic which was ansible and presented on evening class.
+# I'm doing coding practice and pushing the code to git.
+# I have created introduction video and sent it to staff.
+ 
