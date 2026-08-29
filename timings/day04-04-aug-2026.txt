@@ -1,0 +1,12 @@
+### Day 4
+
+What did I learn today
+# I have attended today's class where I learned the concept of User management , file permissions, authentication and commonly used linux commands  for 2 and half an hour.
+
+# I have practice those commands on AWS CLI  for 2 hours.
+
+# I practiced speaking related to technical discussion for 1 hour.
+
+# Attended evening class for 30 mins
+
+# Completed daily coding tasks and push to the git repo for 1 and half an hour.    
