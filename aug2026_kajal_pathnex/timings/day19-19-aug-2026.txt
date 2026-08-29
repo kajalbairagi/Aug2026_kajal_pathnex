@@ -1,0 +1,8 @@
+ # Day 19 
+
+# I watched today's class and learnt about Argo cd which is a CD tool and did practice  for almost 4 hours
+# I have prepared the topic and revised the concepts for 1 hour
+# I watched the Cab video where i understood the working slang and concept of corporate
+# I have attended evening class for 30 mins
+# did the daily git tasks
+# I will make the introduction video 

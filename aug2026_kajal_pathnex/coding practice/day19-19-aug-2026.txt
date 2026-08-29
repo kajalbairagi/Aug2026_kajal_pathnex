@@ -1,0 +1,138 @@
+# Day 19 - Git Deploy, RDS skeleton, Rolling Startegy, Ping check 
+
+
+## Ansible - Deploy app using Git 
+
+- name: Deploy app from git for pathnex
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Install git
+      yum:
+       name: git
+       state: present
+
+    - name: clone repository
+      git: 
+        repo: "git@github.com:kajalbairagi/Aug2026_kajal_pathnex.git"
+        dest: "/opt/pathnex-app"
+
+
+## terraform - RDS Skeleton (Mysql)
+
+resource "aws_db_instance" "PathnexRDS"{
+  allocated_storage  = 20	
+  engine             = "mysql" 
+  instance_class     = "db.t3.micro"
+  username           = "admin"
+  password           = "Pathnex123"
+  skip_final_snapshot= true
+}
+
+
+## Kubernetes - Deployment Rolling Update (Detailed)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: pathnex-rollout
+
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+       maxSurge: 2
+       maxUnavailable: 1
+  selector:
+     matchlabels:
+       app: rollout
+  template:
+    metadata:
+      labels:
+        app: rollout
+    spec:
+     containers:
+        - name: app
+          image: nginx
+
+
+
+## Shell Script - check Internet connectivity
+
+#!/bin/bash
+
+ping -c 2 google.com &> /dev/null
+
+if [ $? -eq 0 ]; then
+ echo "Internet is available"
+else
+  echo "No Internet connection"
+
+fi
+
+## Approvals
+
+pipeline{
+ agent any
+ environment{
+  INSTITUTE_NAME = "Pathnex"
+}
+    stages{
+      stage('Deploy'){
+       steps {
+        input message: "Approve deployment for $INSTITUTE_NAME?"
+        sh 'echo " Deployment approved and executed!"'
+       
+}
+}
+
+
+}
+}
+
+
+## GitLab _ CI - manual approval Job
+
+stages:
+ - deploy
+
+variables:
+  stage: deploy
+  image: alpine:latest
+  script:
+    - echo "Ready to deploy $INSTITUTE_NAME"
+   when: manual
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

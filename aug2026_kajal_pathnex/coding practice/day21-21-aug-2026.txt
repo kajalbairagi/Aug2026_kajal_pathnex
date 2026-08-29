@@ -1,0 +1,158 @@
+#Day 21 
+
+# Ansible - nginx.yml
+
+- name: Install and configure nginx
+  hosts: all
+  become: yes
+
+  tasks:
+   - name: Install Nginx
+     yum:
+     name: nginx
+     state: present
+
+   - name: Start and enable Nginx
+     service:
+        name: nginx
+        state: started
+        enabled: yes
+
+
+# Terraform - main.tf
+
+provider "aws" {
+
+ region = "ap-south-1"
+}
+
+resource "aws_instance" "pathnex_ec2"{
+   ami = "ami-o1234abcd1234abcd"
+   instance_type = "t3.micro"
+
+   tags = {
+    Name = "Pathnex-EC2"
+     OWNER = "PathnexStudent"
+}
+
+}
+
+
+
+## Kubernetes  - nginx -deployment. yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: nginx-deployment
+ 
+spec:
+  replicas: 3
+
+selector:
+  matchLabels:
+   app: nginx
+
+template:
+   metadata:
+   labels:
+     app: nginx
+
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      ports:
+        - containerPort: 80
+
+
+
+## Shell Script - system- info.sh
+
+#!/bin/bash
+
+echo " Current Date "
+date
+
+echo " "
+
+echo " System Uptime "
+uptime
+
+echo " Disk usage "
+df -h
+
+
+
+## Multi-environment Pipeline
+
+ # Jenkins pipeline - Deploy to Multiple environments
+
+pipeline{
+agent any
+environment{
+  INSTITUTE_NAME = "Pathnex"
+}
+
+stages{
+  stage('Deploy to Dev'){
+    steps {
+      sh 'echo " Deploying $INSTITUTE_NAME to dev environment"'
+}
+}
+    stage('Deploy to Staging'){
+      steps{
+        input message: "Approve staging Deployment"
+        sh 'echo "Deployment $INSTITUTE_NAME to Staging environment"'
+}
+
+}
+
+    stage('Deployment to prod '){
+      steps{
+          input message: "Approve prod Deployment?"
+            sh 'echo "Deployng $INSTITUTE_NAME to prod environment"'
+}
+
+}
+
+
+}
+
+}
+
+
+
+## GitLab CI - Muilti-environment
+
+stages:
+  - deploy
+
+variables:
+  INSTITUTE_NAME: "Pathnex"
+
+deploy-dev:
+   stage: deploy
+   image: alpine:latest
+    script: 
+      - echo "Deploying $INSTITUTE_NAME to Dev environmet"
+
+deploy-staging:
+    stage: deploy
+    image: alpine:latest
+    script:
+      - echo "Deploying $INSTITUTE_NAME to staging environment"
+    when: manual
+
+deploy-prod:
+    stage: deploy
+    image: alpine:latest
+     script: 
+        - echo "Deployment #INSTITUTE_NAME to prod environment"
+     when" manual
+
+
+
+
+
+

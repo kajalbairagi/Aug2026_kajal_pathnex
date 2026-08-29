@@ -1,0 +1,7 @@
+## Day 16 
+
+# I have attended 4 hours class in the morning.
+# I did hands-on for 2 hours which i have learnt in today's class
+# I'll revised and prepare the content for evening class in 1 hour.
+# I'm doing daily coding tasks right now.
+   
