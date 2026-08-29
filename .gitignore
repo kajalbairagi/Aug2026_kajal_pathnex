@@ -1,0 +1,10 @@
+cat > .gitignore <<'EOF'
+.ssh/
+.bash_history
+.bash_logout
+.bash_profile
+.bashrc
+.gitconfig
+.viminfo
+*.pem
+EOF
