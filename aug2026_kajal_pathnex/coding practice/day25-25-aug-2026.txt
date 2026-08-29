@@ -1,0 +1,128 @@
+# Day 25 - Linefile, key Pair, Multi-container, File count
+
+## Ansible - Modify Existing Line
+
+---
+- name: Update SSH config for Pathnex
+  hosts: all
+  become: yes
+
+  tasks:
+   - name: Disble root login
+     lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^PermitRootLogin"
+        line: "PermitRootLogin no"
+
+
+## Terraform - EC2 Key Pair Output
+
+resource "aws-key_pair" "PathnexKey"{
+  key_name = "Pathnexkey"
+  public_key = file("~/.ssh/id_rsa.pub")
+}
+
+output "Pathnex_Key_Name"{
+  value = aws_key_pair.PathnexKey.key_name
+
+}
+
+
+## Kubernetes - Muilti-Container Pod (Sidecar Logging)
+
+apiversion: V1
+kind: Pod
+metadata:
+  - name: pathnex-sidecar
+    image: nginx
+  - name: log-writer
+    image: busybox
+    command: ["sh", "-c","while true; do echo log entry; sleep 5; done"]
+
+
+
+## Advanced Caching
+
+## Jenkins Pipeline - cache Dependencies
+
+pipeline{
+ agent any
+ environment{
+    INSTITUTE_NAME = "Pathnex"
+    TEAM = "Devops"
+    ENV = "staging"
+
+}
+stages{
+ stage('Checkout'){
+   steps{
+    sh '''
+     if [ -d ",m2" ]; then
+          echo "Using cached dependencies for $INSITUTE_NAME in $ENV by $TEAM"
+      else
+         mvn clean compile
+      fi
+       '''
+ }
+}
+
+}
+}
+
+## GitLab CI - CAche Dependencies
+
+stages:
+ - build
+ 
+variables:
+   INSTITUTE_NAME: "Pathnex"
+   TEAM: "Devops"
+   ENV: "staging"
+
+build:
+   stage: build
+   image: maven:3.8.1-jdk-17
+   cache:
+     key: "${ENV}-maven-cache"
+     paths:
+       - .m2/repository
+     script:
+       - mvn clean compile
+       - echo "Cache dependencies for $INSTITUTE_NAME in $ENV by $TEAM"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
