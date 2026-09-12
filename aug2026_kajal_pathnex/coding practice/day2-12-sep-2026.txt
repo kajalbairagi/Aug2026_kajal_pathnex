@@ -1,0 +1,101 @@
+##Day 2 - 12 sep
+
+## Ansible - Install and enable nginx
+
+---
+- name: Install and start Nginx on parhnex
+  hosts: all
+  become: yes
+
+  tasks:
+   - name: Install Nginx
+     yum:
+      name: nginx
+      state: present
+
+ 
+   - name: Start nginx
+     service:
+       name: nginx
+       state: started
+       enabled: yes
+
+
+## Terraform - EC2 with Tags(r5.2xlarge)
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "Ec2-pathnex"{
+  ami           = "ami-1234acbd1234acbd"
+  instance_type = "ri.2xlarge"
+
+tags = {
+      Name = "Pathnex-server"
+      Environment = "Training"
+      Owner = "Pathnex"
+ }
+
+}
+
+
+## Kubernetes - Deployment with 2 relpicas
+
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+ name: Pathnex-deployment
+
+spec:
+  replicas: 2
+  selector:
+    matchlabels:
+      app: pathnex-app
+
+  template:
+    metadata:
+      labels:
+        app: pathnex-app
+  spec:
+     containers:
+       - name: app
+         image: nginx
+         ports:
+          - containerPort: 80
+
+
+## Shell Script - Disk Usage
+
+#!/bin/bash
+df -h
+
+## Docker - Images & Conatainers
+
+docker pull ubuntu
+docker images
+docker ps -a
+
+## Dockerfile
+
+FROM ubuntu:22.04
+
+RUN apt update
+
+CMD ["echo", "Hello Pathnex"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
