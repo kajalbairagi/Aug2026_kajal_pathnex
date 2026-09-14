@@ -1,0 +1,7 @@
+#Day 29 
+# Date 3 -sep 
+# I have revised the concept of AWS and Docker.
+# I have attended the evening class where I discussed the Aws and docker interview quetions
+# I'm writing code and practicing 
+# I'll learn other topics like Kubernetes and helm
+

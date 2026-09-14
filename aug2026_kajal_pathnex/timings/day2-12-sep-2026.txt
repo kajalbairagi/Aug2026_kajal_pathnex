@@ -1,0 +1,7 @@
+# Day 2 L2
+# I'm revising my concepts related to docker and ansible 
+# I'm writing yaml files and push to git hub
+# I'll do hands-on practice of docker and terraform 
+# I'll create Introduction video 
+# I'll attend the eneving class where we discuss important questions.
+
