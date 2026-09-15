@@ -1,0 +1,5 @@
+# day 3
+# I have revised the kubernetes concepts 
+# I have created introduction video
+# I have attended evening class 
+# I'm writing code  
