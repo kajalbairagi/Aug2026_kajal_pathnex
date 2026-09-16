@@ -1,0 +1,473 @@
+#Day 29 - Real World MINI project 
+
+## Terraform
+
+terrafrom{
+  required_providers{
+    aws = {
+      source = "hashicorp/aws"
+      version = "~> 6.0"
+   }
+ }
+}
+
+## AWS Provider
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+## Variables
+
+
+variable "instance_type"{
+   description = "EC2 instance type"
+   type = string
+}
+
+variable "ami_id"{
+  description = "AMI ID"
+  type = string
+  default = "ami-o1234abcd1234ab"
+}
+
+
+variable "volume_size" {
+  description = "Additional EBS volume size in GB"
+  type =   number
+  default = 20
+}
+
+variable "key_name" {
+ default = "my-key"
+}
+
+## Security Group
+
+resource "aws_security_group" "ec2_sg"{
+  name = "pathnex-ec2-sg"
+  description = "Security group for Terraform EC2"
+
+
+##SSH
+ingress {
+  description = "Allow SSH"
+  from_port = 22
+  to_port = 22
+  protocol = "tcp"
+  cidr_block = ["0.0.0.0/0"]
+}
+
+## HTTP
+ingress{
+  description = "allow http"
+  from_port = 80
+  to_port = 80
+  protocol = "tcp"
+  cidr_block = ["0.0.0.0/0"]
+
+}
+
+#Outbound traffic 
+egress {
+ from_port = 0
+ to_port = 0
+ protocol = "-1"
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+tags = {
+  Name = "pathnex-ec2-sg"
+}
+}
+
+
+##EC2 Instance
+
+resource "aws_instance" "web_server"{
+  ami  = var.ami_id
+  instance_type = var.instance_type
+
+# Existing AWS key pair
+key_name = var.key_name
+
+
+# Security group
+vpc_security_group_ids = [
+  aws_security_group.ec2_sg.id 
+]
+
+tags = {
+  Name = "Terraform-EC2"
+}
+}
+
+
+Attach EBS to EC2
+
+resource "aws_volume_attachmet" "data_volume_attachment"{
+   device_name = "/dev/sdf"
+   volume_id = aws_ebs_volume.data_volume.id
+   instance_id = aws_instance.web_server.id
+
+}
+
+#Outputs
+
+output "instance_id" {
+  value = aws_instance.web_server.id
+}
+
+output "instance_public_ip" {
+  value = aws_instance.web_server.public_ip
+}
+
+output "security_group_id" {
+  value = aws_security_group.ec2_sg.id
+}
+
+output "ebs_volume_id" {
+  value = aws_ebs_volume.data_volume.id
+}
+
+
+
+## Ansible ---
+
+---
+- name: Install and Configure Nginx
+  hosts: web
+  become: yes
+
+ tasks:
+  - name: Install nginx
+    yum:
+     name: nginx
+     state: present
+
+  - name: Deploy welcome to pathnex HTML page
+    yum:
+      content: |
+       <!DOCTYPE html>
+       <html>
+        <head> 
+            <title> Pathnex </title>
+</head>
+<body>
+<h1>Welcome to pathnex</h1>
+</body>
+</html>
+
+ dest: /usr/share/nginx/html/index.html
+  owner: root
+  group: root
+  mode: '0644'
+
+  - name: Start and enable nginx
+    service:
+      name: nginx
+      state: started
+      enabled: yes
+
+
+## Kubernetes
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pathnex-pvc
+
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+     storage: 1Gi
+
+
+## Deployment
+apiVersion: app/v1
+kind: Deployment
+metadata: 
+  name: pathnex-deployment
+
+spec:
+  replicas:2
+
+  selector:
+    matchLabels:
+     app: pathnex
+
+  template:
+    metadata:
+     Labels:
+       app: pathnex
+
+spec:
+  containers:
+   - name: nginx
+     image: nginx:latest
+
+     ports:
+       - containerPort: 80
+     volumeMounts:
+       - name: pathnex-storage
+         mountPath: /usr/share/nginx/html
+
+     volumes:
+      - name: pathnex-storage
+        persistentVolumeClaim:
+          claimname: pathnex-pvc
+
+
+## NordPort
+
+apiVersion: v1
+kind: Service
+metadata:
+   name: pathnex-service
+
+spec:
+  type: NodePort
+
+  selector:
+    app : pathnex
+
+   ports:
+     - port: 80
+       targetPort: 80
+       NodePort: 30080
+
+
+##Shell script
+
+echo "CPU usage"
+top -bn1 | grep "Cpu(s)" | awk '{print "CPU Usage: " $2 "%"}'
+
+echo "Memory"
+free -h
+
+echo "Disk usage"
+df -h/
+
+echo "IP address"
+hostname -I
+
+echo "Top Process"
+ps aux --sort=-%cpu | head -n 2
+
+
+## Jenklins
+
+pipeline {
+
+    agent any
+
+    environment {
+        INSTITUTE_NAME = "Pathnex"
+        TEAM           = "DevOps"
+        ENV            = "prod"
+        PROJECT        = "Pathnex-Training"
+    }
+
+    stages {
+
+         stage('Infrastructure') {
+
+            steps {
+                echo "Infrastructure Provisioning"
+                echo "Institute : ${INSTITUTE_NAME}"
+                echo "Team      : ${TEAM}"
+                echo "Environment: ${ENV}"
+                echo "Project   : ${PROJECT}"
+             dir('terraform') {
+
+                    sh 'terraform init'
+
+                    sh 'terraform validate'
+
+                    sh 'terraform plan'
+
+                    sh 'terraform apply -auto-approve'
+                }
+            }
+        }
+
+         stage('App Deployment - Ansible') {
+
+            steps {
+
+                echo "Installing and configuring application using Ansible"
+
+                dir('ansible') {
+
+                    sh 'ansible-playbook -i inventory nginx.yml'
+                }
+            }
+        }
+
+       stage('App Deployment - Kubernetes') {
+
+            steps {
+
+                echo "Deploying Kubernetes resources"
+
+                dir('kubernetes') {
+
+                    sh 'kubectl apply -f k8s.yml'
+
+                    sh 'kubectl get pods'
+
+                    sh 'kubectl get svc'
+                }
+            }
+        }
+
+           stage('Monitoring Checks') {
+
+            steps {
+
+                echo "Running system health checks"
+
+                sh 'chmod +x system_check.sh'
+
+                sh './system_check.sh'
+            }
+        }
+    }
+
+ post {
+
+        success {
+            echo "Pipeline completed successfully!"
+            echo "Project: ${PROJECT}"
+            echo "Environment: ${ENV}"
+            }
+
+        failure {
+             echo "Pipeline FAILED!"
+            echo "Please check the Jenkins console logs."
+                  }
+
+        always {
+            echo "Pipeline execution completed."
+        }
+    }
+}
+
+
+
+## GitLab
+
+variables:
+  INSTITUTE_NAME: "pathnex"
+  TEAM: "Devops"
+  ENV: "prod"
+  PROJECT: "PATHNEX-TRAINING"
+
+
+stages:
+  - infrastructure
+  - app_deployment
+  - monitoring_checks
+
+terraform_apply:
+   name: hashicorp/terraform:latest
+   entryPoint: [""]
+
+before_script:
+   
+    - echo "Terraform Infrastructure Deployment"
+    - echo "Institute: $INSTITUTE_NAME"
+    - echo "Team: $TEAM"
+    - echo "Environment: $ENV"
+    - echo "Project: $PROJECT"
+
+script:
+ - cd terraform
+ - terraform init
+ - terraform validate
+ - terraform plan
+ - terraform apply -auto-approve
+
+ansible_deployment:
+  stage: app_deployment
+  
+  image: python:3.12
+
+before_script:
+    - echo "Ansible Application Deployment"
+    - echo "Institute: $INSTITUTE_NAME"
+    - echo "Team: $TEAM"
+    - echo "Environment: $ENV"
+    - echo "Project: $PROJECT"
+
+- pip install ansible
+
+script:
+ -cd ansible
+
+- ansible all -i inventory -m ping
+
+- ansible-playbook -i inventory nginx.yml
+
+
+
+
+kubernetes_deployment:
+  stage: app_deployment
+
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+
+  before_script:
+    
+    - echo "Kubernetes Deployment"
+    - echo "Institute: $INSTITUTE_NAME"
+    - echo "Team: $TEAM"
+    - echo "Environment: $ENV"
+    - echo "Project: $PROJECT"
+
+script:
+
+ - kubectl get nodes
+ - kubectl apply -f kubernetes/k8s.yml
+ - kubectl get deployments
+ - kubectl get pods
+ - kubectl get pods
+ - kubectl get svc
+
+
+monitoring_checks:
+  stage: monitoring_checks
+
+  image: ubuntu:latest
+
+  before_script:
+    
+    - echo "System Monitoring Checks"
+    - echo "Institute: $INSTITUTE_NAME"
+    - echo "Team: $TEAM"
+    - echo "Environment: $ENV"
+    - echo "Project: $PROJECT"
+    
+    # Install required tools
+    - apt-get update -y
+    - apt-get install -y procps iproute2
+
+  script:
+
+    # Make shell script executable
+    - chmod +x system_check.sh
+
+    # Run all system checks
+    - ./system_check.sh
+
+  after_script:
+    - echo "Monitoring Checks Completed"
+    
+
+
+
