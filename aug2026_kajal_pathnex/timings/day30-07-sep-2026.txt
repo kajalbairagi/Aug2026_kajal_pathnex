@@ -1,0 +1,5 @@
+# Day 30 
+# I have revised the concept related to ELK stack and Devsecops
+# I have discussed the concepts in the evening class
+# I have created interview video 
+# I am doing coding practice.

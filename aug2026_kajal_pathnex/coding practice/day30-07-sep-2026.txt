@@ -1,0 +1,228 @@
+##DAY 30 
+
+# Ansible 
+
+---
+ - name: Create Pathnex Admin User
+   hosts: all
+   become: yes
+
+  tasks:
+  - name: Create User
+    User:
+      name: pathnex-admin
+      shell: /bin/bash
+      create_home: yes
+   
+  - name: Add SSH key
+    authorized_key:
+  user: pathnex-admin
+  key: "{{ lookup('file', '~/.ssh/id_rsa.pub')}}"
+
+
+
+# Terraform
+
+provider "aws" {
+
+ region = "ap-south-1"
+}
+
+resource "aws_instance" "ec2_instance"{
+  ami = "ami - hbdsjhdsjdsmj"
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "Pathnex-ec2"
+ }
+
+}
+
+
+## Kubernetes
+
+apiVaersion: apps/v1
+kind: Deployment
+metadata:
+  name: pathnex-app
+
+spec:
+  replicas: 2
+  
+selector
+  matchlabels:
+   app: pathnex-app
+
+  template:
+   metadata: 
+    labels:
+       app: pathnex-app
+
+  spec:
+    containers:
+      - name: pathnex-container
+        image: nginx:latest
+        ports:
+         - conatinerPort: 80
+
+
+##SHell script
+
+#!/bin/bash
+
+while true
+do
+   echo " SYSTEM MENU "
+ echo "1 ) IP"
+ echo "2) DISK"
+ echo "3) Memory"
+ echo "4) Exit"
+
+read -p "Enter your choice: " choice
+
+case $choice in
+
+1)
+echo "IP address"
+hostname -I
+;;
+
+2)
+echo "Disk Usage"
+df -h 
+;;
+
+3)
+echo "Memory Usage"
+free -h 
+;;
+
+4)
+echo "Exiting.."
+exit 0 
+;;
+
+*)
+echo "Invalid Choice"
+;;
+
+
+esac
+done
+
+
+
+## Jenkins
+
+pipeline{
+  agent any
+
+  environment{
+    INSTITUTE_NAME = "Pathnex"
+    TEAM = "Devops"
+    ENV  = "Prod"
+    PROJECT = "Pathnex- Training"
+}
+
+ stages{
+   stage('Initialize'){
+     steps{
+       echo "Institute : ${INSITUTE_NAME}"
+       echo "Team : ${TEAM}"
+       echo "Environment : ${PROJECT}"
+ 
+
+ }
+}
+
+    stage('Infrastructure'){
+      steps {
+        echo "Creating EC2 infra.."
+    
+         dir('terraform'){
+          sh 'terraform init'
+         
+          sh '''
+              terraform plan \
+              - var= "project= ${PROJECT}"
+              '''
+
+          sh '''
+              terraform apply - auto-approve \
+               - var="project= ${PROJECT}"
+              '''
+
+}
+
+}
+
+}
+
+ stage('App Deployment'){
+    steps{
+      echo "Configuring server using Ansible..."
+
+      dir('ansible'){
+           sh '''
+             ansible-playbook \
+             -i inventory \
+                user.yml
+                '''
+
+
+}
+   echo "Deploying application to kubernetes..."
+     dir('kubernetes'){
+         sh 'kubectl apply -f deployment.yml'
+         sh 'kubectl apply -f service.yml'
+}
+ echo "Checking kubernetes resources..."
+  sh 'kubectl get pods'
+  sh 'kubectl get svc'
+}
+
+}
+
+   stage('Monitoring Checks'){
+     steps{
+      echo "Running monitoring checks..."
+
+      sh '''
+       chmod +x scripts/monitoring.sh
+       scripts/monitroing.sh
+         '''
+}
+}
+}
+
+post {
+   success{
+    echo "Pipeline completed successfully!"
+
+}
+ failure{
+    echo "Pipeline failed. Please check Jenkins logs."
+
+}
+
+always {
+ echo "Pipeline execution completed." 
+}
+
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,95 @@
+# Day 6 -  Introduction to cloudFormation and kubernetes ADvanced Concepts
+
+## Ansible - Install Docker
+
+``` yaml
+---
+- name: Install docker
+  hosts: all
+  become: yes
+
+ tasks:
+   - name: Install Docker
+     yum:
+      name: docker
+      state: present
+   
+   - name: Start Docker
+     service:
+       name: docker
+       state: started
+       enabled: yes
+
+
+## terraform - Provisioning Ec2 with VPC
+
+resource "aws_vpc" "mani"{
+  cidr_block = "10.0.0.0/16"
+}
+
+
+
+Resource "aws_instance" "pathnex-ec2"{
+    ami = "ami- o123ancn13323and"
+    instance_type = "t3.medium"
+    subnet_id  = aws_subnet.main.id
+
+tags = {
+   Name = "Pathnex-EC2"
+}
+}
+
+
+## kubernetes - pod with volume mount
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pathnex-pod
+
+spec:
+ conatiners:
+   - name: web
+     image: nginx
+     volumeMounts:
+       - mountPath: /usr/share/nginx/html
+         name: html-volume
+ volumes:
+   - name: html-volume
+     hostPath:
+       path: /data
+       type: Directory
+
+
+## Shell Script - check for running services
+
+#!/bin/bash
+services=("nginx" "docker" "httpd")
+for service in "${services[0]}"
+ do 
+   if systemctl is-active --quit $service; then
+     echo "$service is running"
+   else
+     echo "$service is not running"
+   if 
+ done
+
+
+# Docker
+
+# Node.js apllication(javascript)
+console.log("hello pathnex");
+
+##Docker file
+
+FROM node:18
+WORKDIR /opt/pathnex/node-app
+COPY app.js /opt/pathnex/node-app
+CMD ["node", "/opt/pathnex/node-app"]
+
+
+# Real Path 
+/opt/pathnex/node-app
+
+
+
