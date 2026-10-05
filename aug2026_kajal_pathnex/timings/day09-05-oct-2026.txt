@@ -1,0 +1,6 @@
+ # Day 09 L2 
+# I have learnt scenario based questions and answers
+# I have seen Docker video 
+# I have attended the evening session
+# I'm doing coding practice
+
