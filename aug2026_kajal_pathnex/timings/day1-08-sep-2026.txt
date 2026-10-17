@@ -1,0 +1,5 @@
+## Day 1
+# I have revised the concept related to Datadog, ssl, RAG and kubernetes
+# I have created intro video 
+# I'm doing coding practice 
+
