@@ -1,0 +1,6 @@
+ # Day 3 
+# I have revised the concepts related to Kubernetes 
+# I have done hands-on practice using terraform 
+# I have attended the evening class where we discussed k8s interview questions
+# i'm practicing code
+
