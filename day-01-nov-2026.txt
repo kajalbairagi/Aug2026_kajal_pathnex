@@ -1,0 +1,90 @@
+# Day 01 - basics 
+
+# Ansible Task - Install Nginx on Pathnex Server
+
+- name: Install Nginx on Pathnex server
+  hosts: all
+  become: yes
+
+  tasks:
+   - name: Install
+     yum:
+      name: nginx
+      state: present
+
+
+# Terraform Task - Create EC2 (c5.xlarge)
+
+provider "aws" {
+  reagion = "us-east-1"
+}
+
+resource "aws_instance" "PathnexEC2"{
+  ami = "ami-0593d733c2fc5bd2e"
+  instance_type = "c5.xlarge"
+
+  tags = {
+    Name = "Pathnex-EC2"
+ }
+}
+
+
+# Kubernetes Task - Create Nginx Pod
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: Pathnex-pod
+
+spec:
+  containers: 
+   - name: web
+     image: nginx:latest
+     ports:
+       - containerPort: 80
+
+
+# Shell Script - print date & Hostname
+
+#!/bin/bash
+echo "Date: $(date)"
+echo "Hostname: $(hostname)"
+
+# Git Integration
+# Jenkins Pipeline - Checkout Git
+
+pipeline{
+   agent any
+   stages{
+     stage('Checkout'){
+      steps{
+      git branch: 'main', url: 'https://github.com/pathnex/newfile-java.git
+  }
+}
+      stage('List Files'){
+       steps{
+        sh 'ls -la'
+    }       
+   }
+
+ }
+}
+
+
+
+# Gitlab CI - checkout Git
+
+stages:
+  -checkout
+
+git-checkout:
+   stage: checkout
+   script:
+     - git clone https://github.com/pathnex/newfile-java.git
+     - cd newfile-java
+     - ls -la
+
+
+
+
