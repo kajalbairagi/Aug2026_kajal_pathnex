@@ -1,0 +1,158 @@
+# Day 11 - Database, outputs, sidecars, functions
+
+## Ansible - Install MariaDB
+
+- name: Install MariaDB for Pathnex
+  hosts: all
+  become: yes
+
+tasks:
+   - name: Install MariaDB
+     Yum:
+       name: mariadb-server
+       state: present
+
+   - name: Start MariaDB
+     service:
+        name: mariadb
+        state: started
+        enabled: yes
+
+
+
+## Terraform - Output public IP (r5.2xlarge)
+
+resource "aws_instance" "PathnexServer"{
+   ami = "ami-o1234abcd1234abcd"
+   instance_type = "r5.2xlarge"
+
+
+  tags = {
+     Name = "pathnex- Output-EC2"
+
+  }
+}
+
+output "PathnexPubliceIP"{
+ value = aws_instance.PathnexServer.publicIp
+
+}
+
+
+## Kubernetes - sidecar Container
+
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: pathnex-sidecar
+spec: 
+  conatainers:
+     - name: main
+       image: ngnix
+     - name:  sidecar
+       image: busybox
+       command: ["sh", "-c" "echo Sidercar running; sleep 3600"]
+
+
+## Shell Script - function Example
+
+ #!/bin/bash
+ 
+greet(){
+echo "Welcome to Pathnex Devops training"
+}
+
+
+
+## Notifications
+
+# Jenkins pipeline - Email notifications
+
+pipeline {
+ agent any
+ environment{
+  INSTITUTE_NAME = "Pathnex"
+
+}
+
+Stages{
+  stage('Checkout'){
+   steps{
+     git url: 'https://github.com/kajalbairagi/Aug2026_kajal_pathnex.git'
+
+}
+}
+
+   stage('Build'){
+     steps{
+      sh 'mvn clean package'
+
+ }
+}
+
+}
+
+port{
+   success{
+     mail to: 'team@pathnex.com',
+       subject: "SUCCESS: Build #${env.BUILD_NEMBER}",
+       body: "Build completed successfully for $INSTITUTE_NAME"
+}
+    failure{
+      mail to: 'team@pathnex.com',
+          subject: "FAILURE: Build #${env.BUILD_NUMBER}",
+     body: "Build failed for  $INSTITUTE_NAME"  
+}
+}
+
+}
+
+
+
+## GitLab CI - Notifications
+
+
+stages:
+  - build
+
+build:
+  stage:build
+  image: maven:3.8.1-jdk-17
+  script:
+    - git clone https://github.com/kajalbairagi/Aug2026_kajal_pathnex.git
+    - cd aug2026_kajal_pathnex
+    - mvn clean package
+
+  after_script:
+    - echo "Sending notification email to team@pathnex.com"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
